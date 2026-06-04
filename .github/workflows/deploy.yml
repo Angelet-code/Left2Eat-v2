@@ -33,12 +33,15 @@ jobs:
         working-directory: app
         run: npm ci
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Build
         working-directory: app
         run: npm run build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: app/dist
 
