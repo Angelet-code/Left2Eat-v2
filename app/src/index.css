@@ -212,10 +212,15 @@ input:focus-visible {
 
 .today-header {
   display: grid;
-  grid-template-columns: 58px 1fr 58px 58px;
+  grid-template-columns: 58px minmax(0, 1fr) 58px;
   gap: var(--space-3);
   align-items: center;
   text-align: center;
+}
+
+.today-header > div {
+  min-width: 0;
+  justify-self: center;
 }
 
 .today-header span {
@@ -337,12 +342,20 @@ input:focus-visible {
   min-width: 0;
 }
 
-.macro-bar__header strong {
-  font-size: 19px;
+.macro-bar__title {
+  display: flex;
   min-width: 0;
+  align-items: baseline;
+  gap: 8px;
 }
 
-.macro-bar__header span {
+.macro-bar__title strong {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: 19px;
+}
+
+.macro-bar__amount {
   flex: 0 0 auto;
 }
 
@@ -358,7 +371,7 @@ input:focus-visible {
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 800;
-  text-align: right;
+  white-space: nowrap;
 }
 
 .macro-bar__status--low {
@@ -622,6 +635,15 @@ input:focus-visible {
   margin-top: 0;
 }
 
+.food-filter {
+  margin-top: 12px;
+}
+
+.recommendations-section,
+.food-library-section {
+  margin-top: 18px;
+}
+
 .food-card {
   position: relative;
   display: grid;
@@ -669,7 +691,8 @@ input:focus-visible {
   width: min(100%, 480px);
   margin: 0 auto;
   overflow: auto;
-  padding: max(28px, env(safe-area-inset-top)) 28px 34px;
+  padding: max(28px, env(safe-area-inset-top)) 28px
+    calc(130px + env(safe-area-inset-bottom));
   background: var(--bg);
 }
 
@@ -707,17 +730,22 @@ input:focus-visible {
 }
 
 .selected-tray {
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 2px 12px;
   align-items: center;
-  margin-top: 18px;
+  width: min(calc(100% - 56px), 424px);
+  margin-top: 0;
   padding: 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-lg);
   background: rgb(255 250 241 / 94%);
+  box-shadow: var(--shadow);
+  transform: translateX(-50%);
 }
 
 .selected-tray span {
@@ -952,8 +980,12 @@ input:focus-visible {
   }
 
   .macro-bar__header {
-    flex-wrap: wrap;
     gap: 4px 8px;
+  }
+
+  .macro-bar__title {
+    flex-wrap: wrap;
+    gap: 2px 6px;
   }
 
   .food-grid {

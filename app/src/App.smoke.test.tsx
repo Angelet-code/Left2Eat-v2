@@ -27,7 +27,15 @@ describe('Left2Eat smoke flow', () => {
     await user.click(screen.getByRole('button', { name: /Volver/i }));
     await user.click(within(nav).getByRole('button', { name: /^Hoy$/i }));
     await user.click(screen.getByRole('button', { name: /Añadir comida/i }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    let dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).getByRole('heading', { name: 'Recomendados' })).toBeInTheDocument();
+    const macroFilter = within(dialog).getByRole('group', { name: 'Filtrar alimentos' });
+    await user.click(within(macroFilter).getByRole('button', { name: /Proteina/i }));
+    expect(within(dialog).getByRole('button', { name: /Pechuga de pollo/i })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: /Arroz cocido/i })).not.toBeInTheDocument();
+    await user.click(within(macroFilter).getByRole('button', { name: /Todos/i }));
+
     await user.type(screen.getByPlaceholderText('Buscar alimento o alias'), 'arroz');
     await user.click(screen.getByRole('button', { name: /Arroz cocido/i }));
     await user.clear(screen.getByPlaceholderText('Buscar alimento o alias'));
@@ -36,7 +44,7 @@ describe('Left2Eat smoke flow', () => {
 
     await user.click(screen.getByRole('button', { name: /Continuar/i }));
     expect(screen.getByText(/1 de 2 alimentos/i)).toBeInTheDocument();
-    let dialog = screen.getByRole('dialog');
+    dialog = screen.getByRole('dialog');
     const quantityInput = within(dialog).getByRole('spinbutton', { name: 'Cantidad' });
     await user.clear(quantityInput);
     await user.type(quantityInput, '100');

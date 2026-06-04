@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Plus, Trash2, UserRound, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { baseFoods } from '../../data/baseFoods';
 import type { Food } from '../../domain/food';
@@ -17,6 +17,11 @@ import {
   type QuantityMode,
 } from '../../domain/meals';
 import { calculateDailyNutrition } from '../../domain/nutrition';
+import {
+  filterFoodsByMacro,
+  recommendFoodsForMeal,
+  type MacroFilter,
+} from '../../domain/recommendations';
 import { useAppState } from '../../state/AppStateProvider';
 import { FoodCard } from '../../ui/FoodCard';
 import { FoodSprite } from '../../ui/FoodSprite';
@@ -25,10 +30,6 @@ import { PixelButton } from '../../ui/PixelButton';
 import { SearchInput } from '../../ui/SearchInput';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import { SurfaceCard } from '../../ui/SurfaceCard';
-
-type TodayScreenProps = {
-  onOpenProfile: () => void;
-};
 
 const trainingOptions: Array<{ value: TrainingType; label: string }> = [
   { value: 'none', label: 'Sin entreno' },
@@ -46,6 +47,14 @@ const intensityOptions: Array<{ value: TrainingIntensity; label: string }> = [
 const quantityOptions: Array<{ value: QuantityMode; label: string }> = [
   { value: 'grams', label: 'g' },
   { value: 'eyeball', label: 'a ojo' },
+];
+
+const macroFilterOptions: Array<{ value: MacroFilter; label: string }> = [
+  { value: 'all', label: 'Todos' },
+  { value: 'protein', label: 'Proteina' },
+  { value: 'carb', label: 'Carbo' },
+  { value: 'fiber', label: 'Fibra' },
+  { value: 'fat', label: 'Grasa' },
 ];
 
 function KcalSummary({ nutrition }: { nutrition: ReturnType<typeof calculateDailyNutrition> }) {
@@ -173,15 +182,18 @@ function MealCard({ dateKey, meal }: { dateKey: string; meal: Meal }): JSX.Eleme
 
 function AddMealFlow({
   dateKey,
+  nutrition,
   onClose,
 }: {
   dateKey: string;
+  nutrition: ReturnType<typeof calculateDailyNutrition>;
   onClose: () => void;
 }): JSX.Element {
   const { state, dispatch } = useAppState();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const [step, setStep] = useState<'select' | 'quantity'>('select');
   const [query, setQuery] = useState('');
+  const [macroFilter, setMacroFilter] = useState<MacroFilter>('all');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [quantityMode, setQuantityMode] = useState<QuantityMode>(state.settings.quantityMode);
@@ -189,7 +201,41 @@ function AddMealFlow({
     {},
   );
   const foodById = useMemo(() => new Map(baseFoods.map((food) => [food.id, food])), []);
-  const foods = searchFoods(baseFoods, query, state.favoriteFoodIds).slice(0, 24);
+  const favoriteIds = useMemo(() => new Set(state.favoriteFoodIds), [state.favoriteFoodIds]);
+  const librarySourceFoods = useMemo(() => {
+    const favorites: Food[] = [];
+    const regular: Food[] = [];
+
+    for (const food of baseFoods) {
+      if (favoriteIds.has(food.id)) {
+        favorites.push(food);
+      } else {
+        regular.push(food);
+      }
+    }
+
+    return [...favorites, ...regular];
+  }, [favoriteIds]);
+  const libraryFoods = useMemo(() => {
+    const source = query.trim()
+      ? searchFoods(baseFoods, query, state.favoriteFoodIds)
+      : librarySourceFoods;
+    return filterFoodsByMacro(source, macroFilter);
+  }, [librarySourceFoods, macroFilter, query, state.favoriteFoodIds]);
+  const recommendedFoods = useMemo(
+    () =>
+      recommendFoodsForMeal(
+        baseFoods,
+        {
+          selectedFoodIds: selectedIds,
+          favoriteFoodIds: state.favoriteFoodIds,
+          nutrition,
+        },
+        6,
+      ),
+    [nutrition, selectedIds, state.favoriteFoodIds],
+  );
+  const showRecommendations = query.trim() === '' && macroFilter === 'all';
   const selectedFoods = selectedIds
     .map((id) => foodById.get(id))
     .filter((food): food is Food => Boolean(food));
@@ -278,17 +324,55 @@ function AddMealFlow({
             placeholder="Buscar alimento o alias"
             onChange={(event) => setQuery(event.currentTarget.value)}
           />
-          <div className="food-grid">
-            {foods.map((food) => (
-              <FoodCard
-                key={food.id}
-                food={food}
-                selected={selectedIds.includes(food.id)}
-                favorite={food.favorite}
-                onClick={() => toggleFood(food.id)}
-              />
-            ))}
-          </div>
+          <SegmentedControl<MacroFilter>
+            label="Filtrar alimentos"
+            value={macroFilter}
+            options={macroFilterOptions}
+            onChange={setMacroFilter}
+            className="food-filter"
+          />
+          {showRecommendations && recommendedFoods.length > 0 && (
+            <section className="recommendations-section">
+              <div className="section-title">
+                <h2>Recomendados</h2>
+                <span>{recommendedFoods.length}</span>
+              </div>
+              <div className="food-grid food-grid--compact">
+                {recommendedFoods.map((food) => (
+                  <FoodCard
+                    key={food.id}
+                    food={food}
+                    favorite={favoriteIds.has(food.id)}
+                    onClick={() => toggleFood(food.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+          <section className="food-library-section">
+            <div className="section-title">
+              <h2>{query.trim() || macroFilter !== 'all' ? 'Resultados' : 'Todos los alimentos'}</h2>
+              <span>{libraryFoods.length}</span>
+            </div>
+            {libraryFoods.length === 0 ? (
+              <SurfaceCard className="empty-state">
+                <strong>No hay resultados</strong>
+                <p>Prueba con otro nombre, alias o filtro.</p>
+              </SurfaceCard>
+            ) : (
+              <div className="food-grid food-grid--compact">
+                {libraryFoods.map((food) => (
+                  <FoodCard
+                    key={food.id}
+                    food={food}
+                    selected={selectedIds.includes(food.id)}
+                    favorite={favoriteIds.has(food.id)}
+                    onClick={() => toggleFood(food.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
           <div className="selected-tray" aria-live="polite">
             <strong>{selectedIds.length} alimentos</strong>
             <span>Comida en curso</span>
@@ -408,7 +492,7 @@ function AddMealFlow({
   );
 }
 
-export function TodayScreen({ onOpenProfile }: TodayScreenProps): JSX.Element {
+export function TodayScreen(): JSX.Element {
   const { state, dispatch } = useAppState();
   const [dateKey, setDateKey] = useState(() => getActiveDateKey());
   const [addingMeal, setAddingMeal] = useState(false);
@@ -439,9 +523,6 @@ export function TodayScreen({ onOpenProfile }: TodayScreenProps): JSX.Element {
           onClick={() => setDateKey((current) => addDays(current, 1))}
         >
           <ChevronRight aria-hidden="true" size={30} />
-        </button>
-        <button type="button" className="square-button" aria-label="Perfil" onClick={onOpenProfile}>
-          <UserRound aria-hidden="true" size={25} />
         </button>
       </header>
 
@@ -544,7 +625,13 @@ export function TodayScreen({ onOpenProfile }: TodayScreenProps): JSX.Element {
         Añadir comida
       </PixelButton>
 
-      {addingMeal && <AddMealFlow dateKey={dateKey} onClose={() => setAddingMeal(false)} />}
+      {addingMeal && (
+        <AddMealFlow
+          dateKey={dateKey}
+          nutrition={nutrition}
+          onClose={() => setAddingMeal(false)}
+        />
+      )}
     </main>
   );
 }

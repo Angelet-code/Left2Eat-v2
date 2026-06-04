@@ -467,7 +467,7 @@ export const baseFoods: readonly Food[] = [
     "fiberG": 3.8,
     "servingLabel": "ración (100 g)",
     "servingGrams": 100,
-    "eyeballUnit": "manojos o puñados",
+    "eyeballUnit": "tallos",
     "spriteKey": "ajitos-tiernos"
   },
   {

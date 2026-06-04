@@ -21,8 +21,16 @@ export function MacroBar({ label, nutrient, tone = 'green' }: MacroBarProps): JS
   return (
     <div className="macro-bar">
       <div className="macro-bar__header">
-        <strong>{label}</strong>
-        <span>
+        <div className="macro-bar__title">
+          <strong>{label}</strong>
+          <span className={`macro-bar__status macro-bar__status--${nutrient.status}`}>
+            {statusText}
+            <span className="sr-only">
+              , rango {formatMacro(min)} a {formatMacro(max)}
+            </span>
+          </span>
+        </div>
+        <span className="macro-bar__amount">
           {formatMacro(nutrient.consumed)} / {formatMacro(nutrient.target)}
         </span>
       </div>
@@ -31,12 +39,6 @@ export function MacroBar({ label, nutrient, tone = 'green' }: MacroBarProps): JS
           className={`macro-bar__fill macro-bar__fill--${tone}`}
           style={{ width: `${progress}%` }}
         />
-      </div>
-      <div className={`macro-bar__status macro-bar__status--${nutrient.status}`}>
-        {statusText}
-        <span className="sr-only">
-          , rango {formatMacro(min)} a {formatMacro(max)}
-        </span>
       </div>
     </div>
   );

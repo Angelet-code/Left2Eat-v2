@@ -36,7 +36,7 @@ Total de alimentos: 85.
 | Gambas cocidas | ración (150 g) | gambas | 99 | 24 g | 0,2 g | 0,3 g | 0 g |
 | Mejillones cocidos | ración (120 g) | mejillones | 86 | 12 g | 3,7 g | 2,2 g | 0 g |
 | Huevo | huevo (60 g) | huevos | 155 | 13 g | 1,1 g | 11 g | 0 g |
-| Ajitos tiernos | ración (100 g) | manojos o puñados | 37 | 1,9 g | 4,7 g | 0,3 g | 3,8 g |
+| Ajitos tiernos | ración (100 g) | tallos | 37 | 1,9 g | 4,7 g | 0,3 g | 3,8 g |
 | Ñoquis | plato (220 g) | platos | 150 | 4 g | 31 g | 0,5 g | 2 g |
 | Patata cocida | patata mediana (180 g) | patatas | 87 | 1,9 g | 20 g | 0,1 g | 1,8 g |
 | Arroz (crudo) | ración (80 g) | vasos | 365 | 7,1 g | 80 g | 0,7 g | 1,3 g |
@@ -95,4 +95,3 @@ Total de alimentos: 85.
 | Queso Mahón | porción (30 g) | porciones o cuñas | 400 | 25 g | 1,5 g | 33 g | 0 g |
 | Queso Roquefort | porción (30 g) | porciones o cuñas | 369 | 21,5 g | 2 g | 30,6 g | 0 g |
 | Queso mezcla madurado Entrepinares | porción (30 g) | porciones o cuñas | 474 | 27 g | 1,5 g | 40 g | 0 g |
-

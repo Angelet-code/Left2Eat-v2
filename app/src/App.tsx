@@ -24,7 +24,7 @@ function AppShell(): JSX.Element {
 
   return (
     <div className="app-frame">
-      {activeTab === 'today' && <TodayScreen onOpenProfile={() => setActiveTab('profile')} />}
+      {activeTab === 'today' && <TodayScreen />}
       {activeTab === 'foods' && <FoodsScreen />}
       {activeTab === 'history' && <HistoryScreen />}
       {activeTab === 'profile' && <ProfileScreen />}
