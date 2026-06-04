@@ -2,14 +2,16 @@ import { baseFoods } from '../data/baseFoods';
 import { createDayDraft, type DayContext } from '../domain/days';
 import { getActiveDateKey } from '../domain/dates';
 import {
+  calculateDayTotals,
   createId,
   createMealItem,
+  roundTotals,
   type Meal,
   type MealItemInput,
   type QuantityMode,
 } from '../domain/meals';
-import type { Profile } from '../domain/nutrition';
-import type { AppState } from '../storage/schema';
+import { calculateDailyNutrition, type NutrientTarget, type Profile } from '../domain/nutrition';
+import type { AppState, RegisteredDay } from '../storage/schema';
 
 export type AppAction =
   | { type: 'ensureActiveDay'; now?: string }
@@ -26,6 +28,7 @@ export type AppAction =
     }
   | { type: 'removeMealItem'; dateKey: string; mealId: string; itemId: string }
   | { type: 'deleteMeal'; dateKey: string; mealId: string; confirmed?: boolean }
+  | { type: 'registerDay'; dateKey: string }
   | { type: 'toggleFavorite'; foodId: string }
   | { type: 'updateProfile'; profile: Profile }
   | { type: 'setQuantityMode'; mode: QuantityMode }
@@ -69,6 +72,47 @@ function validMealInput(input: MealItemInput): boolean {
     input.quantityGrams > 0 &&
     isQuantityMode(input.quantityMode)
   );
+}
+
+function cloneMeals(meals: readonly Meal[]): Meal[] {
+  return meals.map((meal) => ({
+    ...meal,
+    items: meal.items.map((item) => ({
+      ...item,
+      snapshot: { ...item.snapshot },
+    })),
+  }));
+}
+
+function cloneTarget(target: NutrientTarget): NutrientTarget {
+  return {
+    ...target,
+    range: [...target.range],
+  };
+}
+
+function createRegisteredDay(state: AppState, dateKey: string): RegisteredDay | null {
+  const day = state.dayDrafts[dateKey];
+  if (!day || day.meals.length === 0) return null;
+
+  const totals = roundTotals(calculateDayTotals(day.meals));
+  const nutrition = calculateDailyNutrition(state.profile, day.context, totals);
+
+  return {
+    dateKey,
+    registeredAt: new Date().toISOString(),
+    profile: { ...state.profile },
+    context: { ...day.context },
+    meals: cloneMeals(day.meals),
+    totals,
+    nutrition: {
+      kcal: cloneTarget(nutrition.kcal),
+      proteinG: cloneTarget(nutrition.proteinG),
+      carbsG: cloneTarget(nutrition.carbsG),
+      fatG: cloneTarget(nutrition.fatG),
+      fiberG: cloneTarget(nutrition.fiberG),
+    },
+  };
 }
 
 export function appReducer(state: AppState, action: AppAction): AppState {
@@ -173,6 +217,18 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         action.dateKey,
         day.meals.filter((candidate) => candidate.id !== action.mealId),
       );
+    }
+
+    case 'registerDay': {
+      const registeredDay = createRegisteredDay(state, action.dateKey);
+      if (!registeredDay) return state;
+      return {
+        ...state,
+        registeredDays: {
+          ...state.registeredDays,
+          [action.dateKey]: registeredDay,
+        },
+      };
     }
 
     case 'toggleFavorite': {

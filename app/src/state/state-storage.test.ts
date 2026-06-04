@@ -109,7 +109,7 @@ describe('localStorage adapter', () => {
       }),
     );
     const loaded = loadState(storage);
-    expect(loaded.schemaVersion).toBe(1);
+    expect(loaded.schemaVersion).toBe(2);
     expect(loaded.favoriteFoodIds).toEqual(['salmon']);
     expect(loaded.profile.weightKg).toBe(82);
     expect(loaded.profile.ageYears).toBe(30);

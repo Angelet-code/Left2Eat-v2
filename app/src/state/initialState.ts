@@ -7,6 +7,7 @@ export function createInitialState(): AppState {
     profile: { ...DEFAULT_PROFILE },
     favoriteFoodIds: [],
     dayDrafts: {},
+    registeredDays: {},
     settings: {
       quantityMode: 'grams',
     },

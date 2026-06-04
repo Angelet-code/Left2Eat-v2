@@ -1,10 +1,10 @@
-import { ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react';
+import { BookOpenCheck, ChevronLeft, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { baseFoods } from '../../data/baseFoods';
 import type { Food } from '../../domain/food';
 import { getPrimaryMacro, searchFoods } from '../../domain/food';
 import { createDayDraft, type TrainingIntensity, type TrainingType } from '../../domain/days';
-import { addDays, formatShortDate, getActiveDateKey } from '../../domain/dates';
+import { getActiveDateKey } from '../../domain/dates';
 import { formatKcal, formatMacro, formatNumber } from '../../domain/format';
 import {
   calculateDayTotals,
@@ -494,45 +494,23 @@ function AddMealFlow({
 
 export function TodayScreen(): JSX.Element {
   const { state, dispatch } = useAppState();
-  const [dateKey, setDateKey] = useState(() => getActiveDateKey());
+  const dateKey = getActiveDateKey();
   const [addingMeal, setAddingMeal] = useState(false);
   const day = state.dayDrafts[dateKey] ?? createDayDraft(dateKey);
   const totals = roundTotals(calculateDayTotals(day.meals));
   const nutrition = calculateDailyNutrition(state.profile, day.context, totals);
   const priority = nutrition.priorities.find((item) => item.includes('Cubrir')) ?? nutrition.priorities[0];
+  const hasMeals = day.meals.length > 0;
+  const isOptimalRange = [
+    nutrition.kcal,
+    nutrition.proteinG,
+    nutrition.carbsG,
+    nutrition.fatG,
+    nutrition.fiberG,
+  ].every((nutrient) => nutrient.status === 'ok');
 
   return (
-    <main className="screen today-screen">
-      <header className="today-header">
-        <button
-          type="button"
-          className="square-button"
-          aria-label="Dia anterior"
-          onClick={() => setDateKey((current) => addDays(current, -1))}
-        >
-          <ChevronLeft aria-hidden="true" size={30} />
-        </button>
-        <div>
-          <h1>Hoy</h1>
-          <span>{formatShortDate(dateKey)}</span>
-        </div>
-        <button
-          type="button"
-          className="square-button"
-          aria-label="Dia siguiente"
-          onClick={() => setDateKey((current) => addDays(current, 1))}
-        >
-          <ChevronRight aria-hidden="true" size={30} />
-        </button>
-      </header>
-
-      <section className="headline">
-        <h2>Te quedan {formatNumber(Math.max(0, nutrition.kcal.remaining))} kcal</h2>
-        <p>
-          Prioridad: <strong>{priority.replace('Cubrir ', '').toLowerCase()}</strong>
-        </p>
-      </section>
-
+    <main className="screen today-screen" aria-label="Hoy">
       <KcalSummary nutrition={nutrition} />
 
       <SurfaceCard className="macro-card">
@@ -552,7 +530,19 @@ export function TodayScreen(): JSX.Element {
           <FoodSprite spriteKey="brocoli" category="vegetable" size="sm" />
           <MacroBar label="Fibra" nutrient={nutrition.fiberG} tone="orange" />
         </div>
+        <p className="macro-priority">
+          Prioridad: <strong>{priority.replace('Cubrir ', '').toLowerCase()}</strong>
+        </p>
       </SurfaceCard>
+
+      <PixelButton
+        className={`register-day-button ${isOptimalRange ? 'is-gold' : ''}`}
+        disabled={!hasMeals}
+        onClick={() => dispatch({ type: 'registerDay', dateKey })}
+      >
+        <BookOpenCheck aria-hidden="true" size={22} />
+        Registrar día
+      </PixelButton>
 
       <SurfaceCard className="context-card">
         <strong>Contexto del dia</strong>

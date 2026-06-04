@@ -15,8 +15,8 @@ export function MacroBar({ label, nutrient, tone = 'green' }: MacroBarProps): JS
     nutrient.status === 'ok'
       ? 'bien'
       : nutrient.status === 'low'
-        ? `${formatMacro(Math.abs(nutrient.remaining))} por cubrir`
-        : `${formatMacro(Math.abs(nutrient.remaining))} de mas`;
+        ? 'pendiente'
+        : 'alto';
 
   return (
     <div className="macro-bar">

@@ -14,8 +14,12 @@ describe('Left2Eat smoke flow', () => {
     render(<App />);
     const nav = screen.getByRole('navigation', { name: 'Principal' });
 
-    expect(await screen.findByRole('heading', { name: 'Hoy' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Te quedan/i })).toBeInTheDocument();
+    expect(await screen.findByRole('main', { name: 'Hoy' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Hoy' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Te quedan/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Dia anterior/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Dia siguiente/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Registrar día/i })).toBeDisabled();
 
     await user.click(within(nav).getByRole('button', { name: /Alimentos/i }));
     expect(screen.getByRole('heading', { name: 'Alimentos' })).toBeInTheDocument();
@@ -57,6 +61,14 @@ describe('Left2Eat smoke flow', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByText(/Arroz cocido con huevo/i)).toBeInTheDocument();
     expect(localStorage.getItem(STORAGE_KEY)).toContain('arroz-cocido');
+    const registerButton = screen.getByRole('button', { name: /Registrar día/i });
+    expect(registerButton).toBeEnabled();
+    await user.click(registerButton);
+    expect(localStorage.getItem(STORAGE_KEY)).toContain('registeredDays');
+
+    await user.click(within(nav).getByRole('button', { name: /Historial/i }));
+    expect(screen.getByText(/Arroz cocido con huevo/i)).toBeInTheDocument();
+    await user.click(within(nav).getByRole('button', { name: /^Hoy$/i }));
 
     const mealCard = screen.getByText(/Arroz cocido con huevo/i).closest('.surface-card');
     expect(mealCard).toBeTruthy();
