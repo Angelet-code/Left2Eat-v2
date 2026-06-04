@@ -1,5 +1,12 @@
+import { useState } from 'react';
 import { resolveSpriteVariant } from '../data/spriteMap';
 import type { FoodCategory } from '../domain/food';
+
+const spriteAssets = import.meta.glob('../assets/food-sprites/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
 
 type FoodSpriteProps = {
   spriteKey: string;
@@ -7,6 +14,10 @@ type FoodSpriteProps = {
   label?: string;
   size?: 'sm' | 'md' | 'lg';
 };
+
+function resolveSpriteAsset(spriteKey: string): string | undefined {
+  return spriteAssets[`../assets/food-sprites/${spriteKey}.png`];
+}
 
 function SpriteShape({ variant }: { variant: string }): JSX.Element {
   if (variant === 'carb') {
@@ -102,16 +113,29 @@ export function FoodSprite({
   size = 'md',
 }: FoodSpriteProps): JSX.Element {
   const variant = resolveSpriteVariant(spriteKey, category);
+  const [assetFailed, setAssetFailed] = useState(false);
+  const spriteUrl = resolveSpriteAsset(spriteKey);
+  const ariaLabel = label || undefined;
+  const useFallbackSprite = assetFailed || !spriteUrl;
 
   return (
-    <span className={`food-sprite food-sprite--${size}`} aria-label={label} role={label ? 'img' : undefined}>
-      <svg viewBox="0 0 32 32" aria-hidden={label ? undefined : true} focusable="false">
-        <rect x="6" y="7" width="20" height="20" fill="#24160e" opacity="0.18" />
-        <SpriteShape variant={variant} />
-        <rect x="7" y="9" width="2" height="17" fill="#24160e" opacity="0.72" />
-        <rect x="24" y="11" width="2" height="14" fill="#24160e" opacity="0.72" />
-        <rect x="9" y="25" width="16" height="2" fill="#24160e" opacity="0.72" />
-      </svg>
+    <span
+      className={`food-sprite food-sprite--${size}`}
+      aria-label={ariaLabel}
+      role={ariaLabel ? 'img' : undefined}
+      aria-hidden={ariaLabel ? undefined : true}
+    >
+      {useFallbackSprite ? (
+        <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect x="6" y="7" width="20" height="20" fill="#24160e" opacity="0.18" />
+          <SpriteShape variant={variant} />
+          <rect x="7" y="9" width="2" height="17" fill="#24160e" opacity="0.72" />
+          <rect x="24" y="11" width="2" height="14" fill="#24160e" opacity="0.72" />
+          <rect x="9" y="25" width="16" height="2" fill="#24160e" opacity="0.72" />
+        </svg>
+      ) : (
+        <img src={spriteUrl} alt="" draggable="false" onError={() => setAssetFailed(true)} />
+      )}
     </span>
   );
 }

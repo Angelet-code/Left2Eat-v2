@@ -554,11 +554,20 @@ input:focus-visible {
   image-rendering: pixelated;
 }
 
-.food-sprite svg {
+.food-sprite svg,
+.food-sprite img {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.food-sprite svg {
   shape-rendering: crispEdges;
+}
+
+.food-sprite img {
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .food-sprite--sm {
