@@ -1,0 +1,18 @@
+{
+  "name": "Left2Eat",
+  "short_name": "Left2Eat",
+  "description": "Registro diario de comidas y macros restantes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf5ea",
+  "theme_color": "#fbf5ea",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it } from 'vitest';
+import App from './App';
+import { STORAGE_KEY } from './storage/schema';
+
+describe('Left2Eat smoke flow', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('navigates tabs, favorites food, adds a meal and persists state', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const nav = screen.getByRole('navigation', { name: 'Principal' });
+
+    expect(await screen.findByRole('heading', { name: 'Hoy' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Te quedan/i })).toBeInTheDocument();
+
+    await user.click(within(nav).getByRole('button', { name: /Alimentos/i }));
+    expect(screen.getByRole('heading', { name: 'Alimentos' })).toBeInTheDocument();
+    await user.type(screen.getByPlaceholderText('Buscar alimento o alias'), 'salmon');
+    await user.click(screen.getByRole('button', { name: /Salmón/i }));
+    await user.click(screen.getByRole('button', { name: /Marcar favorito/i }));
+    expect(screen.getByRole('button', { name: /Favorito/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Volver/i }));
+    await user.click(within(nav).getByRole('button', { name: /^Hoy$/i }));
+    await user.click(screen.getByRole('button', { name: /Añadir comida/i }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.type(screen.getByPlaceholderText('Buscar alimento o alias'), 'arroz');
+    await user.click(screen.getByRole('button', { name: /Arroz cocido/i }));
+    await user.clear(screen.getByPlaceholderText('Buscar alimento o alias'));
+    await user.type(screen.getByPlaceholderText('Buscar alimento o alias'), 'huevo');
+    await user.click(screen.getByRole('button', { name: /^Huevo/i }));
+
+    await user.click(screen.getByRole('button', { name: /Continuar/i }));
+    expect(screen.getByText(/1 de 2 alimentos/i)).toBeInTheDocument();
+    let dialog = screen.getByRole('dialog');
+    const quantityInput = within(dialog).getByRole('spinbutton', { name: 'Cantidad' });
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '100');
+    await user.click(within(dialog).getByRole('button', { name: /^Siguiente$/i }));
+    dialog = screen.getByRole('dialog');
+    await user.clear(within(dialog).getByRole('spinbutton', { name: 'Cantidad' }));
+    await user.type(within(dialog).getByRole('spinbutton', { name: 'Cantidad' }), '60');
+    await user.click(within(dialog).getByRole('button', { name: /Registrar comida/i }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText(/Arroz cocido con huevo/i)).toBeInTheDocument();
+    expect(localStorage.getItem(STORAGE_KEY)).toContain('arroz-cocido');
+
+    const mealCard = screen.getByText(/Arroz cocido con huevo/i).closest('.surface-card');
+    expect(mealCard).toBeTruthy();
+    const inputs = within(mealCard as HTMLElement).getAllByRole('spinbutton');
+    await user.clear(inputs[0]);
+    await user.type(inputs[0], '120');
+    expect(localStorage.getItem(STORAGE_KEY)).toContain('salmon');
+  });
+
+  it('shows profile and history tabs', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const nav = screen.getByRole('navigation', { name: 'Principal' });
+
+    await user.click(within(nav).getByRole('button', { name: /Perfil/i }));
+    expect(screen.getByRole('heading', { name: 'Perfil' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Guardar perfil/i })).toBeDisabled();
+
+    await user.click(within(nav).getByRole('button', { name: /Historial/i }));
+    expect(screen.getByRole('heading', { name: 'Historial' })).toBeInTheDocument();
+    expect(screen.getByText(/Aun no hay dias registrados/i)).toBeInTheDocument();
+  });
+});
