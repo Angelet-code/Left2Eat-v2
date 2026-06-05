@@ -88,7 +88,7 @@ describe('Left2Eat smoke flow', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Día registrado');
 
-    await waitForElementToBeRemoved(() => screen.queryByRole('status'), { timeout: 2500 });
+    await waitForElementToBeRemoved(() => screen.queryByRole('status'), { timeout: 3500 });
   });
 
   it('shows profile and history tabs', async () => {

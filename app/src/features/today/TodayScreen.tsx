@@ -512,7 +512,7 @@ export function TodayScreen(): JSX.Element {
 
   useEffect(() => {
     if (!showRegisteredPopup) return undefined;
-    const timeout = window.setTimeout(() => setShowRegisteredPopup(false), 2000);
+    const timeout = window.setTimeout(() => setShowRegisteredPopup(false), 3000);
     return () => window.clearTimeout(timeout);
   }, [showRegisteredPopup]);
 
