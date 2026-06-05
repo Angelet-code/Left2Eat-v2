@@ -2,14 +2,27 @@ import { ArrowLeft, Star } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { baseFoods } from '../../data/baseFoods';
 import type { Food } from '../../domain/food';
-import { getPrimaryMacro, searchFoods } from '../../domain/food';
+import { getDisplayFoodName, getPrimaryMacro, searchFoods } from '../../domain/food';
 import { formatKcal, formatMacro } from '../../domain/format';
+import {
+  filterFoodsByMacro,
+  type MacroFilter,
+} from '../../domain/recommendations';
 import { useAppState } from '../../state/AppStateProvider';
 import { FoodCard } from '../../ui/FoodCard';
 import { FoodSprite } from '../../ui/FoodSprite';
 import { PixelButton } from '../../ui/PixelButton';
 import { SearchInput } from '../../ui/SearchInput';
+import { SegmentedControl } from '../../ui/SegmentedControl';
 import { SurfaceCard } from '../../ui/SurfaceCard';
+
+const macroFilterOptions: Array<{ value: MacroFilter; label: string }> = [
+  { value: 'all', label: 'Todos' },
+  { value: 'protein', label: 'Proteina' },
+  { value: 'carb', label: 'Carbo' },
+  { value: 'fiber', label: 'Fibra' },
+  { value: 'fat', label: 'Grasa' },
+];
 
 function FoodDetail({
   food,
@@ -22,15 +35,17 @@ function FoodDetail({
   onBack: () => void;
   onToggleFavorite: () => void;
 }): JSX.Element {
+  const displayName = getDisplayFoodName(food);
+
   return (
     <main className="screen food-detail">
       <button type="button" className="icon-button" aria-label="Volver" onClick={onBack}>
         <ArrowLeft aria-hidden="true" size={28} />
       </button>
       <section className="food-detail__hero">
-        <FoodSprite spriteKey={food.spriteKey} category={food.category} label={food.name} size="lg" />
+        <FoodSprite spriteKey={food.spriteKey} category={food.category} label={displayName} size="lg" />
         <span>{getPrimaryMacro(food)}</span>
-        <h1>{food.name}</h1>
+        <h1>{displayName}</h1>
         <PixelButton className={favorite ? 'is-soft' : ''} onClick={onToggleFavorite}>
           <Star aria-hidden="true" size={20} fill={favorite ? 'currentColor' : 'none'} />
           {favorite ? 'Favorito' : 'Marcar favorito'}
@@ -74,14 +89,16 @@ function FoodDetail({
 export function FoodsScreen(): JSX.Element {
   const { state, dispatch } = useAppState();
   const [query, setQuery] = useState('');
+  const [macroFilter, setMacroFilter] = useState<MacroFilter>('all');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const results = useMemo(
-    () => searchFoods(baseFoods, query, state.favoriteFoodIds),
-    [query, state.favoriteFoodIds],
+    () => filterFoodsByMacro(searchFoods(baseFoods, query, state.favoriteFoodIds), macroFilter),
+    [macroFilter, query, state.favoriteFoodIds],
   );
+  const hasActiveFilter = query.trim() !== '' || macroFilter !== 'all';
   const favoriteIds = new Set(state.favoriteFoodIds);
   const favorites = results.filter((food) => favoriteIds.has(food.id));
-  const library = query ? results : results.slice(0, 85);
+  const library = hasActiveFilter ? results : results.slice(0, 85);
 
   if (selectedFood) {
     return (
@@ -105,6 +122,13 @@ export function FoodsScreen(): JSX.Element {
         placeholder="Buscar alimento o alias"
         onChange={(event) => setQuery(event.currentTarget.value)}
       />
+      <SegmentedControl<MacroFilter>
+        label="Filtrar alimentos por macro"
+        value={macroFilter}
+        options={macroFilterOptions}
+        onChange={setMacroFilter}
+        className="food-filter"
+      />
 
       {favorites.length > 0 && (
         <section>
@@ -127,13 +151,13 @@ export function FoodsScreen(): JSX.Element {
 
       <section>
         <div className="section-title">
-          <h2>Biblioteca</h2>
+          <h2>{hasActiveFilter ? 'Resultados' : 'Biblioteca'}</h2>
           <span>{library.length}</span>
         </div>
         {library.length === 0 ? (
           <SurfaceCard className="empty-state">
             <strong>No hay resultados</strong>
-            <p>Prueba con otro nombre o alias.</p>
+            <p>Prueba con otro nombre, alias o filtro.</p>
           </SurfaceCard>
         ) : (
           <div className="food-grid food-grid--compact">

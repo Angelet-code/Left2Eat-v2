@@ -51,6 +51,15 @@ const LOW_STATUS_BY_TAG: Record<FoodMacroTag, keyof RecommendationNutrition> = {
   fat: 'fatG',
 };
 
+const SECONDARY_MACRO_SHARE_THRESHOLD = 0.25;
+
+const MIN_FILTER_MACRO_AMOUNT_G: Record<FoodMacroTag, number> = {
+  protein: 3,
+  carb: 5,
+  fiber: 2,
+  fat: 3,
+};
+
 const PLATE_TAGS: readonly FoodMacroTag[] = ['protein', 'carb', 'fiber'];
 
 const PROTEIN_MAIN_PROFILES: readonly PairingProfile[] = [
@@ -75,6 +84,10 @@ const SAVORY_SIDE_PROFILES: readonly PairingProfile[] = [
   'vegetable',
 ];
 
+function isRecommendableFood(food: Food): boolean {
+  return food.category !== 'drink';
+}
+
 export function getFoodMacroTags(food: Food): FoodMacroTag[] {
   const tags = new Set<FoodMacroTag>();
 
@@ -94,12 +107,70 @@ export function getFoodMacroTags(food: Food): FoodMacroTag[] {
   return Array.from(tags);
 }
 
+function getFilterMacroAmount(food: Food, tag: FoodMacroTag): number {
+  if (tag === 'protein') return food.proteinG;
+  if (tag === 'carb') return food.carbsG;
+  if (tag === 'fiber') return food.fiberG;
+  return food.fatG;
+}
+
+function getFilterMacroShare(food: Food, tag: FoodMacroTag): number {
+  const totalMacroGrams = food.proteinG + food.carbsG + food.fatG + food.fiberG;
+  return totalMacroGrams > 0 ? getFilterMacroAmount(food, tag) / totalMacroGrams : 0;
+}
+
+function getPrimaryFilterMacro(food: Food): FoodMacroTag | null {
+  if (food.category === 'vegetable' || food.category === 'legume') return 'fiber';
+
+  const macroGrams: Array<{ tag: FoodMacroTag; grams: number }> = [
+    { tag: 'protein', grams: food.proteinG },
+    { tag: 'carb', grams: food.carbsG },
+    { tag: 'fat', grams: food.fatG },
+    { tag: 'fiber', grams: food.fiberG },
+  ];
+  const primary = macroGrams.reduce((best, item) => (item.grams > best.grams ? item : best));
+
+  return primary.grams > 0 ? primary.tag : null;
+}
+
+function getMacroFilterRank(food: Food, filter: FoodMacroTag): 0 | 1 | null {
+  const primaryMacro = getPrimaryFilterMacro(food);
+  const macroAmount = getFilterMacroAmount(food, filter);
+  const hasPracticalAmount = macroAmount >= MIN_FILTER_MACRO_AMOUNT_G[filter];
+  const isTaggedForMacro = getFoodMacroTags(food).includes(filter);
+
+  if (primaryMacro === filter && (isTaggedForMacro || hasPracticalAmount)) {
+    return 0;
+  }
+
+  if (
+    isTaggedForMacro ||
+    (hasPracticalAmount && getFilterMacroShare(food, filter) > SECONDARY_MACRO_SHARE_THRESHOLD)
+  ) {
+    return 1;
+  }
+
+  return null;
+}
+
 export function filterFoodsByMacro<T extends Food>(
   foods: readonly T[],
   filter: MacroFilter,
 ): T[] {
   if (filter === 'all') return [...foods];
-  return foods.filter((food) => getFoodMacroTags(food).includes(filter));
+
+  return foods
+    .map((food, originalIndex) => ({
+      food,
+      originalIndex,
+      rank: getMacroFilterRank(food, filter),
+    }))
+    .filter((item): item is { food: T; originalIndex: number; rank: 0 | 1 } => item.rank !== null)
+    .sort((a, b) => {
+      if (a.rank !== b.rank) return a.rank - b.rank;
+      return a.originalIndex - b.originalIndex;
+    })
+    .map((item) => item.food);
 }
 
 function hasLowDailyNeed(
@@ -356,7 +427,8 @@ export function recommendFoodsForMeal(
 ): Food[] {
   const selectedIds = new Set(context.selectedFoodIds);
   const favoriteIds = new Set(context.favoriteFoodIds ?? []);
-  const selectedFoods = foods.filter((food) => selectedIds.has(food.id));
+  const recommendableFoods = foods.filter(isRecommendableFood);
+  const selectedFoods = recommendableFoods.filter((food) => selectedIds.has(food.id));
   const selectedTags = new Set<FoodMacroTag>();
 
   for (const food of selectedFoods) {
@@ -365,9 +437,9 @@ export function recommendFoodsForMeal(
     }
   }
   const missingPlateTags = new Set(PLATE_TAGS.filter((tag) => !selectedTags.has(tag)));
-  const shouldCompletePlate = selectedIds.size > 0 && missingPlateTags.size > 0;
+  const shouldCompletePlate = selectedFoods.length > 0 && missingPlateTags.size > 0;
 
-  const rankedItems = foods
+  const rankedItems = recommendableFoods
     .map((food, originalIndex) => {
       const tags = getFoodMacroTags(food);
       const primaryTag = getPrimaryRecommendationTag(food, tags);

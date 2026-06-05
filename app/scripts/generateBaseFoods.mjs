@@ -58,11 +58,22 @@ function compactAliases(name) {
   return [...aliases].filter((alias) => alias !== normalize(name)).slice(0, 6);
 }
 
+const simpleNameBySourceName = new Map([
+  ['Muslo entero de pollo air fryer (con hueso y piel)', 'Muslo de pollo'],
+  ['Alita de pollo air fryer (con hueso y piel)', 'Alita de pollo'],
+]);
+
+const extraAliasesBySourceName = new Map([
+  ['Muslo entero de pollo air fryer (con hueso y piel)', ['muslo entero de pollo air fryer con hueso y piel']],
+  ['Alita de pollo air fryer (con hueso y piel)', ['alita de pollo air fryer con hueso y piel']],
+]);
+
 const categories = [
   ['protein', /salm[oó]n|pollo|pavo|at[uú]n|jam[oó]n|anchoas|lomo|chorizo|fuet|salchich[oó]n|bacon|panceta|ternera|entrecot|merluza|bacalao|sardinas|boquerones|gambas|mejillones|huevo|prote[ií]na/],
   ['carb', /[ñn]oquis|patata|arroz|boniato|quinoa|couscous|pasta|pan|tortilla|avena|muesli/],
   ['fruit', /pl[aá]tano|ar[aá]ndanos|frutos rojos|sand[ií]a|mel[oó]n|manzana|naranja|pera|fresas|uvas|mandarina/],
   ['dairy', /k[eé]fir|yogur|leche|queso fresco/],
+  ['drink', /cafe|cerveza/],
   ['legume', /lentejas|garbanzos|alubias|hummus/],
   ['vegetable', /ajitos|tomate|lechuga|espinacas|cebolla|pimiento|calabac[ií]n|br[oó]coli|zanahoria|coliflor/],
   ['fat', /aceite|cacahuete|chocolate|aguacate/],
@@ -82,15 +93,20 @@ const rows = lines
 
 const foods = rows.map((row) => {
   const [nameRaw, servingRaw, unitRaw, kcalRaw, proteinRaw, carbsRaw, fatRaw, fiberRaw] = row;
-  const name = repairMojibake(nameRaw);
+  const sourceName = repairMojibake(nameRaw);
+  const name = simpleNameBySourceName.get(sourceName) ?? sourceName;
   const servingLabel = repairMojibake(servingRaw);
   const eyeballUnit = repairMojibake(unitRaw);
   const category = categoryFor(name);
+  const stableSlug = slugify(sourceName);
+  const aliases = [...new Set([...compactAliases(name), ...(extraAliasesBySourceName.get(sourceName) ?? [])])]
+    .filter((alias) => alias !== normalize(name))
+    .slice(0, 6);
 
   return {
-    id: slugify(name),
+    id: stableSlug,
     name,
-    aliases: compactAliases(name),
+    aliases,
     category,
     kcal: stripUnit(kcalRaw),
     proteinG: stripUnit(proteinRaw),
@@ -100,7 +116,7 @@ const foods = rows.map((row) => {
     servingLabel,
     servingGrams: servingGrams(servingLabel),
     eyeballUnit,
-    spriteKey: slugify(name),
+    spriteKey: stableSlug,
   };
 });
 

@@ -53,6 +53,33 @@ describe('food macro filters', () => {
     expect(results).not.toContain('arroz-cocido');
   });
 
+  it('keeps secondary macro matches after primary macro matches', () => {
+    const results = filterFoodsByMacro(
+      [food('pechuga-de-pollo'), food('salmon'), food('crema-de-cacahuete')],
+      'protein',
+    ).map((item) => item.id);
+
+    expect(results).toEqual(['pechuga-de-pollo', 'salmon', 'crema-de-cacahuete']);
+  });
+
+  it('treats salmon as a primary protein food by macro grams', () => {
+    const results = filterFoodsByMacro(
+      [food('salmon'), food('arroz-cocido'), food('aceite-de-oliva')],
+      'protein',
+    ).map((item) => item.id);
+
+    expect(results).toEqual(['salmon']);
+  });
+
+  it('keeps lomo embuchado below primary fat foods in fat results', () => {
+    const results = filterFoodsByMacro(
+      [food('lomo-embuchado'), food('aceite-de-oliva'), food('arroz-cocido')],
+      'fat',
+    ).map((item) => item.id);
+
+    expect(results).toEqual(['aceite-de-oliva', 'lomo-embuchado']);
+  });
+
   it('allows foods to appear under multiple macro tags', () => {
     const tags = getFoodMacroTags(food('crema-de-cacahuete'));
 
@@ -245,6 +272,28 @@ describe('meal recommendations', () => {
     );
 
     expect(results.map((item) => item.id)).toEqual(['plain-option', 'fat-option']);
+  });
+
+  it('excludes drinks from meal recommendations', () => {
+    const foods = [
+      testFood('coffee', { category: 'drink' }),
+      testFood('beer', { category: 'drink', kcal: 43, carbsG: 3.6 }),
+      testFood('plain-option'),
+    ];
+    const results = recommendFoodsForMeal(foods, { selectedFoodIds: [] }, 3);
+
+    expect(results.map((item) => item.id)).toEqual(['plain-option']);
+  });
+
+  it('does not use selected drinks as meal context', () => {
+    const foods = [
+      testFood('coffee', { category: 'drink' }),
+      testFood('plain-option'),
+      testFood('protein-option', { category: 'protein', proteinG: 25 }),
+    ];
+    const results = recommendFoodsForMeal(foods, { selectedFoodIds: ['coffee'] }, 3);
+
+    expect(results.map((item) => item.id)).toEqual(['plain-option', 'protein-option']);
   });
 
   it('keeps original order when recommendation scores tie', () => {

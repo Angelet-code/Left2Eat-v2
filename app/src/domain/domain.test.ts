@@ -19,14 +19,18 @@ function food(id: string) {
 }
 
 describe('baseFoods', () => {
-  it('contains the 85 repaired seed foods', () => {
-    expect(baseFoods).toHaveLength(85);
+  it('contains the 87 repaired seed foods', () => {
+    expect(baseFoods).toHaveLength(87);
     expect(food('salmon').name).toBe('Salmón');
+    expect(food('muslo-entero-de-pollo-air-fryer-con-hueso-y-piel').name).toBe('Muslo de pollo');
+    expect(food('alita-de-pollo-air-fryer-con-hueso-y-piel').name).toBe('Alita de pollo');
     expect(food('atun-al-natural-escurrido').name).toBe('Atún al natural (escurrido)');
     expect(food('noquis').name).toBe('Ñoquis');
     expect(food('platano').name).toBe('Plátano');
     expect(food('arandanos').eyeballUnit).toBe('puñados');
     expect(food('pavo').servingLabel).toBe('ración (150 g)');
+    expect(food('cafe-solo').category).toBe('drink');
+    expect(food('cerveza').servingLabel).toBe('lata (330 g)');
   });
 
   it('converts comma decimals and keeps valid stable ids', () => {

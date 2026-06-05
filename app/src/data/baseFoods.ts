@@ -36,14 +36,12 @@ export const baseFoods: readonly Food[] = [
   },
   {
     "id": "muslo-entero-de-pollo-air-fryer-con-hueso-y-piel",
-    "name": "Muslo entero de pollo air fryer (con hueso y piel)",
+    "name": "Muslo de pollo",
     "aliases": [
+      "muslo de pollo",
       "muslo entero de pollo air fryer con hueso y piel",
       "muslo",
-      "entero",
-      "pollo",
-      "fryer",
-      "hueso"
+      "pollo"
     ],
     "category": "protein",
     "kcal": 77,
@@ -58,14 +56,12 @@ export const baseFoods: readonly Food[] = [
   },
   {
     "id": "alita-de-pollo-air-fryer-con-hueso-y-piel",
-    "name": "Alita de pollo air fryer (con hueso y piel)",
+    "name": "Alita de pollo",
     "aliases": [
+      "alita de pollo",
       "alita de pollo air fryer con hueso y piel",
       "alita",
-      "pollo",
-      "fryer",
-      "hueso",
-      "piel"
+      "pollo"
     ],
     "category": "protein",
     "kcal": 86,
@@ -1008,6 +1004,39 @@ export const baseFoods: readonly Food[] = [
     "servingGrams": 125,
     "eyeballUnit": "vasos",
     "spriteKey": "yogur-griego-natural"
+  },
+  {
+    "id": "cafe-solo",
+    "name": "Café solo",
+    "aliases": [
+      "cafe",
+      "solo"
+    ],
+    "category": "drink",
+    "kcal": 2,
+    "proteinG": 0.1,
+    "carbsG": 0,
+    "fatG": 0,
+    "fiberG": 0,
+    "servingLabel": "taza (200 g)",
+    "servingGrams": 200,
+    "eyeballUnit": "tazas",
+    "spriteKey": "cafe-solo"
+  },
+  {
+    "id": "cerveza",
+    "name": "Cerveza",
+    "aliases": [],
+    "category": "drink",
+    "kcal": 43,
+    "proteinG": 0.5,
+    "carbsG": 3.6,
+    "fatG": 0,
+    "fiberG": 0,
+    "servingLabel": "lata (330 g)",
+    "servingGrams": 330,
+    "eyeballUnit": "latas o cañas",
+    "spriteKey": "cerveza"
   },
   {
     "id": "lentejas-cocidas",

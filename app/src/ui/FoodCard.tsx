@@ -1,5 +1,5 @@
 import type { Food } from '../domain/food';
-import { getPrimaryMacro } from '../domain/food';
+import { getDisplayFoodName, getPrimaryMacro } from '../domain/food';
 import { FoodSprite } from './FoodSprite';
 
 type FoodCardProps = {
@@ -10,6 +10,8 @@ type FoodCardProps = {
 };
 
 export function FoodCard({ food, selected = false, favorite = false, onClick }: FoodCardProps): JSX.Element {
+  const displayName = getDisplayFoodName(food);
+
   return (
     <button
       type="button"
@@ -20,8 +22,8 @@ export function FoodCard({ food, selected = false, favorite = false, onClick }: 
       <span className="food-card__favorite" aria-hidden="true">
         {favorite ? '★' : ''}
       </span>
-      <FoodSprite spriteKey={food.spriteKey} category={food.category} label="" size="lg" />
-      <strong>{food.name}</strong>
+      <FoodSprite spriteKey={food.spriteKey} category={food.category} label={displayName} size="lg" />
+      <strong>{displayName}</strong>
       <span>{getPrimaryMacro(food)}</span>
     </button>
   );

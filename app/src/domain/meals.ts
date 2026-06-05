@@ -1,4 +1,4 @@
-import type { Food, FoodCategory } from './food';
+import { getDisplayFoodName, type Food, type FoodCategory } from './food';
 
 export type QuantityMode = 'grams' | 'eyeball';
 
@@ -66,7 +66,7 @@ export function createId(prefix: string): string {
 export function createFoodSnapshot(food: Food): FoodSnapshot {
   return {
     foodId: food.id,
-    name: food.name,
+    name: getDisplayFoodName(food),
     kcal: food.kcal,
     proteinG: food.proteinG,
     carbsG: food.carbsG,
@@ -143,7 +143,9 @@ export function createMealItem(food: Food, input: MealItemInput): MealItem {
 }
 
 export function formatMealName(meal: Pick<Meal, 'items'>): string {
-  const names = meal.items.map((item) => item.snapshot.name);
+  const names = meal.items.map((item) =>
+    getDisplayFoodName({ name: item.snapshot.name, foodId: item.foodId }),
+  );
   if (names.length === 0) return 'Comida sin alimentos';
   if (names.length === 1) return names[0];
 

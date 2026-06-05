@@ -2,7 +2,7 @@ import { BookOpenCheck, ChevronLeft, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { baseFoods } from '../../data/baseFoods';
 import type { Food } from '../../domain/food';
-import { getPrimaryMacro, searchFoods } from '../../domain/food';
+import { getDisplayFoodName, getPrimaryMacro, searchFoods } from '../../domain/food';
 import { createDayDraft, type TrainingIntensity, type TrainingType } from '../../domain/days';
 import { getActiveDateKey } from '../../domain/dates';
 import { formatKcal, formatMacro, formatNumber } from '../../domain/format';
@@ -109,7 +109,11 @@ function MealCard({ dateKey, meal }: { dateKey: string; meal: Meal }): JSX.Eleme
         </div>
         <div>
           <strong>{formatMealName(meal)}</strong>
-          <p>{meal.items.map((item) => item.snapshot.name).join(', ')}</p>
+          <p>
+            {meal.items
+              .map((item) => getDisplayFoodName({ name: item.snapshot.name, foodId: item.foodId }))
+              .join(', ')}
+          </p>
           <span>
             P: {formatMacro(totals.proteinG)} C: {formatMacro(totals.carbsG)} G:{' '}
             {formatMacro(totals.fatG)} F: {formatMacro(totals.fiberG)}
@@ -124,12 +128,12 @@ function MealCard({ dateKey, meal }: { dateKey: string; meal: Meal }): JSX.Eleme
             <FoodSprite
               spriteKey={item.snapshot.spriteKey}
               category={item.snapshot.category}
-              label={item.snapshot.name}
+              label={getDisplayFoodName({ name: item.snapshot.name, foodId: item.foodId })}
               size="sm"
             />
-            <span>{item.snapshot.name}</span>
+            <span>{getDisplayFoodName({ name: item.snapshot.name, foodId: item.foodId })}</span>
             <input
-              aria-label={`Cantidad de ${item.snapshot.name}`}
+              aria-label={`Cantidad de ${getDisplayFoodName({ name: item.snapshot.name, foodId: item.foodId })}`}
               type="number"
               min="1"
               step="5"
@@ -147,7 +151,7 @@ function MealCard({ dateKey, meal }: { dateKey: string; meal: Meal }): JSX.Eleme
             />
             <button
               type="button"
-              aria-label={`Quitar ${item.snapshot.name}`}
+              aria-label={`Quitar ${getDisplayFoodName({ name: item.snapshot.name, foodId: item.foodId })}`}
               onClick={() =>
                 dispatch({
                   type: 'removeMealItem',
@@ -240,6 +244,7 @@ function AddMealFlow({
     .map((id) => foodById.get(id))
     .filter((food): food is Food => Boolean(food));
   const currentFood = selectedFoods[currentIndex];
+  const currentFoodName = currentFood ? getDisplayFoodName(currentFood) : '';
   const currentQuantity = currentFood
     ? quantities[currentFood.id] ?? { grams: currentFood.servingGrams, eyeball: 1 }
     : { grams: 100, eyeball: 1 };
@@ -387,17 +392,17 @@ function AddMealFlow({
             <span>2</span>
             cantidades
           </div>
-          <h1 id="add-flow-title">Cantidad de {currentFood?.name.toLowerCase()}</h1>
+          <h1 id="add-flow-title">Cantidad de {currentFoodName.toLowerCase()}</h1>
           {currentFood && (
             <SurfaceCard className="quantity-food">
               <FoodSprite
                 spriteKey={currentFood.spriteKey}
                 category={currentFood.category}
-                label={currentFood.name}
+                label={currentFoodName}
                 size="lg"
               />
               <div>
-                <strong>{currentFood.name}</strong>
+                <strong>{currentFoodName}</strong>
                 <span>{getPrimaryMacro(currentFood)}</span>
               </div>
             </SurfaceCard>
@@ -411,7 +416,7 @@ function AddMealFlow({
                 type="button"
                 className={index === currentIndex ? 'is-active' : ''}
                 key={food.id}
-                aria-label={`Editar cantidad de ${food.name}`}
+                aria-label={`Editar cantidad de ${getDisplayFoodName(food)}`}
                 onClick={() => setCurrentIndex(index)}
               >
                 <FoodSprite spriteKey={food.spriteKey} category={food.category} size="sm" />
