@@ -155,11 +155,11 @@ export function ProfileScreen(): JSX.Element {
         <h2>Objetivo estimado</h2>
         <dl>
           <div>
-            <dt>Calorias</dt>
+            <dt>Calorías</dt>
             <dd>{formatKcal(nutrition.kcal.target)}</dd>
           </div>
           <div>
-            <dt>Proteina</dt>
+            <dt>Proteína</dt>
             <dd>{formatMacro(nutrition.proteinG.target)}</dd>
           </div>
           <div>

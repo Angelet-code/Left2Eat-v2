@@ -70,6 +70,17 @@ function SpriteShape({ variant }: { variant: string }): JSX.Element {
       </>
     );
   }
+  if (variant === 'drink') {
+    return (
+      <>
+        <rect x="10" y="11" width="12" height="15" fill="#f7efe2" />
+        <rect x="12" y="14" width="8" height="9" fill="#8b5a33" />
+        <rect x="22" y="15" width="4" height="7" fill="#f7efe2" />
+        <rect x="23" y="17" width="2" height="4" fill="#fffaf0" />
+        <rect x="9" y="25" width="15" height="2" fill="#7a4b27" />
+      </>
+    );
+  }
   if (variant === 'fat') {
     return (
       <>

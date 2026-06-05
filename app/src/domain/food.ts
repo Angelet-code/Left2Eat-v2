@@ -108,6 +108,6 @@ export function getPrimaryMacro(food: Pick<Food, 'category'>): string {
   if (food.category === 'fat' || food.category === 'cheese') return 'grasa';
   if (food.category === 'vegetable' || food.category === 'legume') return 'fibra';
   if (food.category === 'drink') return 'bebida';
-  if (food.category === 'dairy') return 'proteina';
-  return 'proteina';
+  if (food.category === 'dairy') return 'proteína';
+  return 'proteína';
 }

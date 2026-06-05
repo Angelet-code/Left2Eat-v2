@@ -7,6 +7,7 @@ export type SpriteVariant =
   | 'vegetable'
   | 'legume'
   | 'dairy'
+  | 'drink'
   | 'fat'
   | 'cheese'
   | 'other'
@@ -19,6 +20,7 @@ const categorySprites: Record<FoodCategory, SpriteVariant> = {
   vegetable: 'vegetable',
   legume: 'legume',
   dairy: 'dairy',
+  drink: 'drink',
   fat: 'fat',
   cheese: 'cheese',
   other: 'other',

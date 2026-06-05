@@ -38,10 +38,9 @@ export const baseFoods: readonly Food[] = [
     "id": "muslo-entero-de-pollo-air-fryer-con-hueso-y-piel",
     "name": "Muslo de pollo",
     "aliases": [
-      "muslo de pollo",
-      "muslo entero de pollo air fryer con hueso y piel",
       "muslo",
-      "pollo"
+      "pollo",
+      "muslo entero de pollo air fryer con hueso y piel"
     ],
     "category": "protein",
     "kcal": 77,
@@ -58,10 +57,9 @@ export const baseFoods: readonly Food[] = [
     "id": "alita-de-pollo-air-fryer-con-hueso-y-piel",
     "name": "Alita de pollo",
     "aliases": [
-      "alita de pollo",
-      "alita de pollo air fryer con hueso y piel",
       "alita",
-      "pollo"
+      "pollo",
+      "alita de pollo air fryer con hueso y piel"
     ],
     "category": "protein",
     "kcal": 86,
@@ -132,7 +130,7 @@ export const baseFoods: readonly Food[] = [
     "name": "Atún al natural (escurrido)",
     "aliases": [
       "atun al natural escurrido",
-      "atun",
+      "atún",
       "natural",
       "escurrido"
     ],
@@ -151,7 +149,7 @@ export const baseFoods: readonly Food[] = [
     "id": "jamon-serrano",
     "name": "Jamón serrano",
     "aliases": [
-      "jamon",
+      "jamón",
       "serrano"
     ],
     "category": "protein",
@@ -189,7 +187,7 @@ export const baseFoods: readonly Food[] = [
     "id": "jamon-cocido",
     "name": "Jamón cocido",
     "aliases": [
-      "jamon",
+      "jamón",
       "cocido"
     ],
     "category": "protein",
@@ -694,7 +692,7 @@ export const baseFoods: readonly Food[] = [
     "name": "Tortilla de maíz",
     "aliases": [
       "tortilla",
-      "maiz"
+      "maíz"
     ],
     "category": "carb",
     "kcal": 218,
@@ -934,7 +932,7 @@ export const baseFoods: readonly Food[] = [
     "id": "kefir-natural",
     "name": "Kéfir natural",
     "aliases": [
-      "kefir",
+      "kéfir",
       "natural"
     ],
     "category": "dairy",
@@ -1009,7 +1007,7 @@ export const baseFoods: readonly Food[] = [
     "id": "cafe-solo",
     "name": "Café solo",
     "aliases": [
-      "cafe",
+      "café",
       "solo"
     ],
     "category": "drink",
@@ -1258,7 +1256,7 @@ export const baseFoods: readonly Food[] = [
     "aliases": [
       "mix de coliflor brocoli y zanahoria",
       "coliflor",
-      "brocoli",
+      "brócoli",
       "zanahoria"
     ],
     "category": "vegetable",
@@ -1416,7 +1414,7 @@ export const baseFoods: readonly Food[] = [
     "name": "Scoop de proteína",
     "aliases": [
       "scoop",
-      "proteina"
+      "proteína"
     ],
     "category": "protein",
     "kcal": 380,
@@ -1434,7 +1432,7 @@ export const baseFoods: readonly Food[] = [
     "name": "Queso Mahón",
     "aliases": [
       "queso",
-      "mahon"
+      "mahón"
     ],
     "category": "cheese",
     "kcal": 400,

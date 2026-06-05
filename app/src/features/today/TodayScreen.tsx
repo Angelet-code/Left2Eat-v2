@@ -51,7 +51,7 @@ const quantityOptions: Array<{ value: QuantityMode; label: string }> = [
 
 const macroFilterOptions: Array<{ value: MacroFilter; label: string }> = [
   { value: 'all', label: 'Todos' },
-  { value: 'protein', label: 'Proteina' },
+  { value: 'protein', label: 'Proteína' },
   { value: 'carb', label: 'Carbo' },
   { value: 'fiber', label: 'Fibra' },
   { value: 'fat', label: 'Grasa' },
@@ -171,7 +171,7 @@ function MealCard({ dateKey, meal }: { dateKey: string; meal: Meal }): JSX.Eleme
         type="button"
         className="text-danger meal-card__delete"
         onClick={() => {
-          if (meal.items.length === 0 || window.confirm('Eliminar esta comida?')) {
+          if (meal.items.length === 0 || window.confirm('¿Eliminar esta comida?')) {
             dispatch({ type: 'deleteMeal', dateKey, mealId: meal.id, confirmed: true });
           }
         }}
@@ -540,7 +540,7 @@ export function TodayScreen(): JSX.Element {
       <SurfaceCard className="macro-card">
         <div className="macro-row">
           <FoodSprite spriteKey="pechuga-de-pollo" category="protein" size="sm" />
-          <MacroBar label="Proteina" nutrient={nutrition.proteinG} tone="orange" />
+          <MacroBar label="Proteína" nutrient={nutrition.proteinG} tone="orange" />
         </div>
         <div className="macro-row">
           <FoodSprite spriteKey="arroz-cocido" category="carb" size="sm" />
@@ -569,7 +569,7 @@ export function TodayScreen(): JSX.Element {
       </PixelButton>
 
       <SurfaceCard className="context-card">
-        <strong>Contexto del dia</strong>
+        <strong>Contexto del día</strong>
         <SegmentedControl
           label="Entreno"
           value={day.context.trainingType}
@@ -614,7 +614,7 @@ export function TodayScreen(): JSX.Element {
         <SurfaceCard className="calculation-note">
           {nutrition.errors.length > 0
             ? 'Revisa el contexto o perfil: hay datos fuera de rango.'
-            : 'Calculo orientativo ajustado por datos poco habituales.'}
+            : 'Cálculo orientativo ajustado por datos poco habituales.'}
         </SurfaceCard>
       )}
 
@@ -627,7 +627,7 @@ export function TodayScreen(): JSX.Element {
           <SurfaceCard className="empty-state">
             <Plus aria-hidden="true" size={32} />
             <strong>Añade tu primera comida</strong>
-            <p>Left2Eat calculara lo que queda por cubrir hoy.</p>
+            <p>Left2Eat calculará lo que queda por cubrir hoy.</p>
           </SurfaceCard>
         ) : (
           day.meals.map((meal) => <MealCard key={meal.id} dateKey={dateKey} meal={meal} />)

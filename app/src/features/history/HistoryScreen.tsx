@@ -15,18 +15,18 @@ export function HistoryScreen(): JSX.Element {
     <main className="screen history-screen">
       <header className="screen-header">
         <h1>Historial</h1>
-        <p>Snapshots estables de dias registrados.</p>
+        <p>Snapshots estables de días registrados.</p>
       </header>
       {registeredDays.length === 0 ? (
         <SurfaceCard className="empty-state history-placeholder">
           <BookOpenCheck aria-hidden="true" size={38} />
-          <strong>Aun no hay dias registrados</strong>
+          <strong>Aún no hay días registrados</strong>
           <p>
-            Cuando registres dias completos, apareceran aqui como snapshots de solo lectura.
+            Cuando registres días completos, aparecerán aquí como snapshots de solo lectura.
           </p>
         </SurfaceCard>
       ) : (
-        <section className="history-list" aria-label="Dias registrados">
+        <section className="history-list" aria-label="Días registrados">
           {registeredDays.map((day) => (
             <SurfaceCard className="history-day-card" key={day.dateKey}>
               <div className="history-day-card__header">
@@ -38,7 +38,7 @@ export function HistoryScreen(): JSX.Element {
               </div>
               <dl>
                 <div>
-                  <dt>Proteina</dt>
+                  <dt>Proteína</dt>
                   <dd>{formatMacro(day.totals.proteinG)}</dd>
                 </div>
                 <div>

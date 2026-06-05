@@ -662,6 +662,158 @@ input:focus-visible {
   margin-top: 12px;
 }
 
+.food-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 0;
+}
+
+.food-list-card {
+  --macro-accent: var(--border-strong);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px;
+  overflow: hidden;
+}
+
+.food-list-card::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 5px;
+  background: var(--macro-accent);
+  content: "";
+}
+
+.food-list-card--protein {
+  --macro-accent: #9d3328;
+}
+
+.food-list-card--carb {
+  --macro-accent: #8a5a00;
+}
+
+.food-list-card--fat {
+  --macro-accent: #684195;
+}
+
+.food-list-card--fiber {
+  --macro-accent: #23672d;
+}
+
+.food-list-card__main,
+.food-list-card__favorite {
+  border: 0;
+  background: transparent;
+}
+
+.food-list-card__main {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  min-height: 108px;
+  padding: 12px;
+  text-align: left;
+}
+
+.food-list-card__body,
+.food-list-card__heading {
+  min-width: 0;
+}
+
+.food-list-card__heading {
+  min-width: 0;
+}
+
+.food-list-card__heading strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.food-list-card__macros {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin: 10px 0 0;
+}
+
+.food-list-card__macro {
+  min-width: 0;
+  position: relative;
+}
+
+.food-list-card__macro + .food-list-card__macro {
+  padding-left: 7px;
+}
+
+.food-list-card__macro + .food-list-card__macro::before {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: 1px;
+  background: rgb(220 202 186 / 72%);
+  content: "";
+}
+
+.food-list-card__macro dt {
+  color: currentColor;
+  font-size: 11px;
+  font-weight: 900;
+  opacity: 0.78;
+}
+
+.food-list-card__macro dd {
+  color: currentColor;
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.food-list-card__macro--kcal {
+  color: #76461e;
+}
+
+.food-list-card__macro--protein {
+  color: #9d3328;
+}
+
+.food-list-card__macro--carb {
+  color: #8a5a00;
+}
+
+.food-list-card__macro--fat {
+  color: #684195;
+}
+
+.food-list-card__macro--fiber {
+  color: #23672d;
+}
+
+.food-list-card__favorite {
+  display: grid;
+  place-items: center;
+  min-width: 54px;
+  border-left: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.food-list-card__favorite.is-active {
+  background: #fff0cf;
+  color: #d78816;
+}
+
 .recommendations-section,
 .food-library-section {
   margin-top: 18px;
@@ -1078,6 +1230,34 @@ input:focus-visible {
 
   .food-card {
     min-height: 136px;
+  }
+
+  .food-list-card {
+    grid-template-columns: minmax(0, 1fr) 48px;
+  }
+
+  .food-list-card__main {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 118px;
+    padding: 10px;
+  }
+
+  .food-list-card__macros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 8px;
+  }
+
+  .food-list-card__macro:nth-child(4) {
+    padding-left: 0;
+  }
+
+  .food-list-card__macro:nth-child(4)::before {
+    content: none;
+  }
+
+  .food-list-card__favorite {
+    min-width: 48px;
   }
 }
 

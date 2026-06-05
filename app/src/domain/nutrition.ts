@@ -94,7 +94,7 @@ const DEFAULT_TRAINING_MINUTES: Record<TrainingType, number> = {
 };
 
 export const NUTRITION_DISCLAIMER =
-  'Left2Eat ofrece estimaciones orientativas para seguimiento personal; no es asesoramiento medico, dietetico ni clinico.';
+  'Left2Eat ofrece estimaciones orientativas para seguimiento personal; no es asesoramiento médico, dietético ni clínico.';
 
 const TRAINING_TYPE_VALUES = ['none', 'strength', 'cardio', 'strength-cardio'] as const;
 const TRAINING_INTENSITY_VALUES = ['easy', 'normal', 'hard'] as const;
@@ -331,13 +331,13 @@ export function calculateDailyNutrition(
   const fiberG = target(safeTotals.fiberG, fiberGoalG, fiberRangeG);
 
   const priorities = [
-    kcal.status === 'high' ? 'Bajar calorias para volver al rango' : null,
-    kcal.status === 'low' ? 'Cubrir energia pendiente sin descuidar macros' : null,
-    proteinG.status === 'low' ? 'Cubrir proteina pendiente' : null,
+    kcal.status === 'high' ? 'Bajar calorías para volver al rango' : null,
+    kcal.status === 'low' ? 'Cubrir energía pendiente sin descuidar macros' : null,
+    proteinG.status === 'low' ? 'Cubrir proteína pendiente' : null,
     fiberG.status === 'low' ? 'Subir fibra con alimentos sencillos' : null,
     fatG.status === 'high' ? 'Moderar grasas hoy' : null,
-    carbsG.status === 'low' ? 'Usar carbohidratos para completar energia' : null,
-    'Preferir consistencia antes que perfeccion de un solo dia',
+    carbsG.status === 'low' ? 'Usar carbohidratos para completar energía' : null,
+    'Preferir consistencia antes que perfección de un solo día',
   ].filter((priority): priority is string => priority !== null);
 
   return {

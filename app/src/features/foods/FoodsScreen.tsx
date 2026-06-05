@@ -9,7 +9,6 @@ import {
   type MacroFilter,
 } from '../../domain/recommendations';
 import { useAppState } from '../../state/AppStateProvider';
-import { FoodCard } from '../../ui/FoodCard';
 import { FoodSprite } from '../../ui/FoodSprite';
 import { PixelButton } from '../../ui/PixelButton';
 import { SearchInput } from '../../ui/SearchInput';
@@ -18,11 +17,87 @@ import { SurfaceCard } from '../../ui/SurfaceCard';
 
 const macroFilterOptions: Array<{ value: MacroFilter; label: string }> = [
   { value: 'all', label: 'Todos' },
-  { value: 'protein', label: 'Proteina' },
+  { value: 'protein', label: 'Proteína' },
   { value: 'carb', label: 'Carbo' },
   { value: 'fiber', label: 'Fibra' },
   { value: 'fat', label: 'Grasa' },
 ];
+
+type MacroTone = 'kcal' | 'protein' | 'carb' | 'fat' | 'fiber';
+
+function getPrimaryMacroTone(food: Pick<Food, 'category'>): MacroTone {
+  if (food.category === 'carb' || food.category === 'fruit') return 'carb';
+  if (food.category === 'fat' || food.category === 'cheese') return 'fat';
+  if (food.category === 'vegetable' || food.category === 'legume') return 'fiber';
+  if (food.category === 'drink') return 'carb';
+  return 'protein';
+}
+
+function MacroStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: MacroTone;
+}): JSX.Element {
+  return (
+    <div className={`food-list-card__macro food-list-card__macro--${tone}`}>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
+function FoodListCard({
+  food,
+  favorite,
+  onOpen,
+  onToggleFavorite,
+}: {
+  food: Food;
+  favorite: boolean;
+  onOpen: () => void;
+  onToggleFavorite: () => void;
+}): JSX.Element {
+  const displayName = getDisplayFoodName(food);
+  const primaryMacroTone = getPrimaryMacroTone(food);
+
+  return (
+    <SurfaceCard className={`food-list-card food-list-card--${primaryMacroTone}`}>
+      <button
+        type="button"
+        className="food-list-card__main"
+        aria-label={displayName}
+        onClick={onOpen}
+      >
+        <FoodSprite spriteKey={food.spriteKey} category={food.category} label={displayName} size="md" />
+        <div className="food-list-card__body">
+          <div className="food-list-card__heading">
+            <strong>{displayName}</strong>
+          </div>
+          <dl className="food-list-card__macros" aria-label="Macros por 100 gramos">
+            <MacroStat label="Kcal" value={formatKcal(food.kcal)} tone="kcal" />
+            <MacroStat label="Prot" value={formatMacro(food.proteinG)} tone="protein" />
+            <MacroStat label="Carbo" value={formatMacro(food.carbsG)} tone="carb" />
+            <MacroStat label="Grasa" value={formatMacro(food.fatG)} tone="fat" />
+            <MacroStat label="Fibra" value={formatMacro(food.fiberG)} tone="fiber" />
+          </dl>
+        </div>
+      </button>
+      <button
+        type="button"
+        className={`food-list-card__favorite ${favorite ? 'is-active' : ''}`}
+        aria-label={favorite ? 'Quitar favorito' : 'Marcar favorito'}
+        aria-pressed={favorite}
+        onClick={onToggleFavorite}
+      >
+        <Star aria-hidden="true" size={22} fill={favorite ? 'currentColor' : 'none'} />
+      </button>
+    </SurfaceCard>
+  );
+}
 
 function FoodDetail({
   food,
@@ -55,11 +130,11 @@ function FoodDetail({
         <h2>Por 100 g</h2>
         <dl>
           <div>
-            <dt>Calorias</dt>
+            <dt>Calorías</dt>
             <dd>{formatKcal(food.kcal)}</dd>
           </div>
           <div>
-            <dt>Proteina</dt>
+            <dt>Proteína</dt>
             <dd>{formatMacro(food.proteinG)}</dd>
           </div>
           <div>
@@ -77,7 +152,7 @@ function FoodDetail({
         </dl>
       </SurfaceCard>
       <SurfaceCard className="serving-detail">
-        <strong>Racion habitual</strong>
+        <strong>Ración habitual</strong>
         <span>{food.servingLabel}</span>
         <strong>Unidad a ojo</strong>
         <span>{food.eyeballUnit}</span>
@@ -136,13 +211,14 @@ export function FoodsScreen(): JSX.Element {
             <h2>Favoritos</h2>
             <span>{favorites.length}</span>
           </div>
-          <div className="food-grid food-grid--compact">
+          <div className="food-list">
             {favorites.slice(0, 6).map((food) => (
-              <FoodCard
+              <FoodListCard
                 key={food.id}
                 food={food}
                 favorite
-                onClick={() => setSelectedFood(food)}
+                onOpen={() => setSelectedFood(food)}
+                onToggleFavorite={() => dispatch({ type: 'toggleFavorite', foodId: food.id })}
               />
             ))}
           </div>
@@ -160,13 +236,14 @@ export function FoodsScreen(): JSX.Element {
             <p>Prueba con otro nombre, alias o filtro.</p>
           </SurfaceCard>
         ) : (
-          <div className="food-grid food-grid--compact">
+          <div className="food-list">
             {library.map((food) => (
-              <FoodCard
+              <FoodListCard
                 key={food.id}
                 food={food}
                 favorite={favoriteIds.has(food.id)}
-                onClick={() => setSelectedFood(food)}
+                onOpen={() => setSelectedFood(food)}
+                onToggleFavorite={() => dispatch({ type: 'toggleFavorite', foodId: food.id })}
               />
             ))}
           </div>

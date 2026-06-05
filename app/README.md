@@ -1,6 +1,6 @@
 # Left2Eat v2
 
-Web/PWA mobile first para registrar comidas y responder que queda por comer en el dia.
+Web/PWA mobile first para registrar comidas y responder qué queda por comer en el día.
 
 ## Scripts
 
@@ -11,7 +11,7 @@ Web/PWA mobile first para registrar comidas y responder que queda por comer en e
 ## Arquitectura
 
 - `src/domain`: modelos y calculos puros.
-- `src/data`: alimentos base estaticos y sprites.
+- `src/data`: alimentos base estáticos y sprites.
 - `src/storage`: schema versionado, migraciones y localStorage.
 - `src/state`: reducer/context de la app.
 - `src/features`: pantallas Hoy, Alimentos, Historial y Perfil.

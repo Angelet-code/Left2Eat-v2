@@ -17,8 +17,8 @@ describe('Left2Eat smoke flow', () => {
     expect(await screen.findByRole('main', { name: 'Hoy' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Hoy' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /Te quedan/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Dia anterior/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Dia siguiente/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Día anterior/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Día siguiente/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Registrar día/i })).toBeDisabled();
 
     await user.click(within(nav).getByRole('button', { name: /Alimentos/i }));
@@ -35,7 +35,7 @@ describe('Left2Eat smoke flow', () => {
     expect(dialog).toBeInTheDocument();
     expect(within(dialog).getByRole('heading', { name: 'Recomendados' })).toBeInTheDocument();
     const macroFilter = within(dialog).getByRole('group', { name: 'Filtrar alimentos' });
-    await user.click(within(macroFilter).getByRole('button', { name: /Proteina/i }));
+    await user.click(within(macroFilter).getByRole('button', { name: /Proteína/i }));
     expect(within(dialog).getByRole('button', { name: /Pechuga de pollo/i })).toBeInTheDocument();
     expect(within(dialog).queryByRole('button', { name: /Arroz cocido/i })).not.toBeInTheDocument();
     await user.click(within(macroFilter).getByRole('button', { name: /Todos/i }));
@@ -102,6 +102,6 @@ describe('Left2Eat smoke flow', () => {
 
     await user.click(within(nav).getByRole('button', { name: /Historial/i }));
     expect(screen.getByRole('heading', { name: 'Historial' })).toBeInTheDocument();
-    expect(screen.getByText(/Aun no hay dias registrados/i)).toBeInTheDocument();
+    expect(screen.getByText(/Aún no hay días registrados/i)).toBeInTheDocument();
   });
 });

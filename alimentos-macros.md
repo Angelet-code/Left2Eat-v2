@@ -6,7 +6,7 @@ Valores nutricionales por 100 g. Se mantiene la ración habitual como referencia
 
 Se omiten sprites, iconos, aliases y cualquier dato visual. Las unidades a ojo son inferidas cuando no existían de forma explícita.
 
-Total de alimentos: 85.
+Total de alimentos: 87.
 
 | Alimento | Ración habitual | Unidad a ojo | kcal/100 g | Proteína/100 g | Carbohidratos/100 g | Grasas/100 g | Fibra/100 g |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
@@ -69,6 +69,8 @@ Total de alimentos: 85.
 | Yogur natural desnatado sin lactosa | vaso (125 g) | vasos | 40 | 4,3 g | 5,1 g | 0,2 g | 0 g |
 | Leche semidesnatada | vaso (250 g) | vasos | 47 | 3,4 g | 4,8 g | 1,6 g | 0 g |
 | Yogur griego natural | vaso (125 g) | vasos | 97 | 9 g | 3,8 g | 5 g | 0 g |
+| Café solo | taza (200 g) | tazas | 2 | 0,1 g | 0 g | 0 g | 0 g |
+| Cerveza | lata (330 g) | latas o cañas | 43 | 0,5 g | 3,6 g | 0 g | 0 g |
 | Lentejas cocidas | plato (250 g) | platos | 116 | 9 g | 20 g | 0,4 g | 7,9 g |
 | Garbanzos cocidos | plato (250 g) | platos | 164 | 8,9 g | 27,4 g | 2,6 g | 7,6 g |
 | Alubias cocidas | plato (250 g) | platos | 114 | 7,8 g | 20 g | 0,5 g | 6,4 g |

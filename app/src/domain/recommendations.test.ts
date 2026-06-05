@@ -25,7 +25,7 @@ function testFood(id: string, values: Partial<Food> = {}): Food {
     carbsG: 0,
     fatG: 0,
     fiberG: 0,
-    servingLabel: 'racion (100 g)',
+    servingLabel: 'ración (100 g)',
     servingGrams: 100,
     eyeballUnit: 'raciones',
     spriteKey: id,

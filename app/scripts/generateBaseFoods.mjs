@@ -30,6 +30,10 @@ function normalize(value) {
     .toLowerCase();
 }
 
+function aliasText(value) {
+  return repairMojibake(value).normalize('NFC').toLowerCase().trim();
+}
+
 function slugify(value) {
   return normalize(value)
     .replace(/ñ/g, 'n')
@@ -43,19 +47,20 @@ function servingGrams(label) {
 }
 
 function compactAliases(name) {
+  const text = aliasText(name);
   const normalized = normalize(name);
   const aliases = new Set();
-  const tokens = normalized
-    .replace(/[^a-z0-9ñ\s]/g, ' ')
+  const tokens = text
+    .replace(/[^\p{L}0-9\s]/gu, ' ')
     .split(/\s+/)
-    .filter((token) => token.length >= 4);
+    .filter((token) => normalize(token).length >= 4);
 
-  aliases.add(normalized);
+  aliases.add(text);
   aliases.add(slugify(name).replaceAll('-', ' '));
   for (const token of tokens) {
     aliases.add(token);
   }
-  return [...aliases].filter((alias) => alias !== normalize(name)).slice(0, 6);
+  return [...aliases].filter((alias) => normalize(alias) !== normalized).slice(0, 6);
 }
 
 const simpleNameBySourceName = new Map([
