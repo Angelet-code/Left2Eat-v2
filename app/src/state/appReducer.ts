@@ -222,8 +222,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'registerDay': {
       const registeredDay = createRegisteredDay(state, action.dateKey);
       if (!registeredDay) return state;
+      const dayDrafts = { ...state.dayDrafts };
+      delete dayDrafts[action.dateKey];
       return {
         ...state,
+        dayDrafts,
         registeredDays: {
           ...state.registeredDays,
           [action.dateKey]: registeredDay,

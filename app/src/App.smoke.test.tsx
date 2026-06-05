@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from './App';
@@ -64,18 +64,31 @@ describe('Left2Eat smoke flow', () => {
     const registerButton = screen.getByRole('button', { name: /Registrar día/i });
     expect(registerButton).toBeEnabled();
     await user.click(registerButton);
+    expect(screen.getByRole('status')).toHaveTextContent('Día registrado');
     expect(localStorage.getItem(STORAGE_KEY)).toContain('registeredDays');
+    expect(screen.getByRole('button', { name: /Registrar día/i })).toBeDisabled();
+    expect(screen.queryByText(/Arroz cocido con huevo/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Añade tu primera comida/i)).toBeInTheDocument();
 
     await user.click(within(nav).getByRole('button', { name: /Historial/i }));
     expect(screen.getByText(/Arroz cocido con huevo/i)).toBeInTheDocument();
     await user.click(within(nav).getByRole('button', { name: /^Hoy$/i }));
-
-    const mealCard = screen.getByText(/Arroz cocido con huevo/i).closest('.surface-card');
-    expect(mealCard).toBeTruthy();
-    const inputs = within(mealCard as HTMLElement).getAllByRole('spinbutton');
-    await user.clear(inputs[0]);
-    await user.type(inputs[0], '120');
     expect(localStorage.getItem(STORAGE_KEY)).toContain('salmon');
+  });
+
+  it('closes the registered day popup after two seconds', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /Añadir comida/i }));
+    await user.click(screen.getByRole('button', { name: /Arroz cocido/i }));
+    await user.click(screen.getByRole('button', { name: /Continuar/i }));
+    await user.click(screen.getByRole('button', { name: /Registrar comida/i }));
+    await user.click(screen.getByRole('button', { name: /Registrar día/i }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Día registrado');
+
+    await waitForElementToBeRemoved(() => screen.queryByRole('status'), { timeout: 2500 });
   });
 
   it('shows profile and history tabs', async () => {

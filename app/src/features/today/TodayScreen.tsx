@@ -496,6 +496,7 @@ export function TodayScreen(): JSX.Element {
   const { state, dispatch } = useAppState();
   const dateKey = getActiveDateKey();
   const [addingMeal, setAddingMeal] = useState(false);
+  const [showRegisteredPopup, setShowRegisteredPopup] = useState(false);
   const day = state.dayDrafts[dateKey] ?? createDayDraft(dateKey);
   const totals = roundTotals(calculateDayTotals(day.meals));
   const nutrition = calculateDailyNutrition(state.profile, day.context, totals);
@@ -509,8 +510,26 @@ export function TodayScreen(): JSX.Element {
     nutrition.fiberG,
   ].every((nutrient) => nutrient.status === 'ok');
 
+  useEffect(() => {
+    if (!showRegisteredPopup) return undefined;
+    const timeout = window.setTimeout(() => setShowRegisteredPopup(false), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [showRegisteredPopup]);
+
+  function registerCurrentDay() {
+    if (!hasMeals) return;
+    dispatch({ type: 'registerDay', dateKey });
+    setShowRegisteredPopup(true);
+  }
+
   return (
     <main className="screen today-screen" aria-label="Hoy">
+      {showRegisteredPopup && (
+        <div className="day-registered-popup" role="status" aria-live="polite">
+          Día registrado
+        </div>
+      )}
+
       <KcalSummary nutrition={nutrition} />
 
       <SurfaceCard className="macro-card">
@@ -538,7 +557,7 @@ export function TodayScreen(): JSX.Element {
       <PixelButton
         className={`register-day-button ${isOptimalRange ? 'is-gold' : ''}`}
         disabled={!hasMeals}
-        onClick={() => dispatch({ type: 'registerDay', dateKey })}
+        onClick={registerCurrentDay}
       >
         <BookOpenCheck aria-hidden="true" size={22} />
         Registrar día
